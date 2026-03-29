@@ -321,7 +321,14 @@ socket.on('game:final', (data) => {
     `).join('')}</tbody>`;
 });
 
-function startGame() { socket.emit('host:start'); }
+function startGame() {
+  console.log('startGame clicked, socket connected:', socket.connected);
+  if (!socket.connected) {
+    alert('Socket not connected! Try refreshing the page.');
+    return;
+  }
+  socket.emit('host:start');
+}
 function nextQuestion() { socket.emit('host:next'); }
 function restartGame() { socket.emit('host:restart'); }
 </script>
