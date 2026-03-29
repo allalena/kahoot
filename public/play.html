@@ -276,7 +276,7 @@ socket.on('player:results', (data) => {
   const myTeamData = data.teams.find(t => t.team === myTeam);
   if (!myTeamData) { show('wait-screen'); return; }
 
-  document.getElementById('res-icon').textContent = myTeamData.isCorrect ? '&#10003;' : '&#10007;';
+  document.getElementById('res-icon').textContent = myTeamData.isCorrect ? '\u2713' : '\u2717';
   document.getElementById('res-icon').style.color = myTeamData.isCorrect ? '#2ecc71' : '#e74c3c';
   document.getElementById('res-text').textContent = myTeamData.isCorrect ? 'Correct!' : 'Wrong!';
   document.getElementById('res-answer').innerHTML =
