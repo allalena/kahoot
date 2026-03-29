@@ -1,0 +1,42 @@
+[
+  {
+    "question": "What is the capital of France?",
+    "answers": ["Berlin", "Paris", "Madrid", "Rome"],
+    "correct": 1
+  },
+  {
+    "question": "Which planet is known as the Red Planet?",
+    "answers": ["Venus", "Jupiter", "Mars", "Saturn"],
+    "correct": 2
+  },
+  {
+    "question": "What is the largest ocean on Earth?",
+    "answers": ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+    "correct": 3
+  },
+  {
+    "question": "Who painted the Mona Lisa?",
+    "answers": ["Leonardo da Vinci", "Michelangelo", "Raphael", "Donatello"],
+    "correct": 0
+  },
+  {
+    "question": "What is the chemical symbol for gold?",
+    "answers": ["Go", "Gd", "Au", "Ag"],
+    "correct": 2
+  },
+  {
+    "question": "How many continents are there?",
+    "answers": ["5", "6", "7", "8"],
+    "correct": 2
+  },
+  {
+    "question": "What year did World War II end?",
+    "answers": ["1943", "1944", "1945", "1946"],
+    "correct": 2
+  },
+  {
+    "question": "What is the speed of light approximately?",
+    "answers": ["150,000 km/s", "300,000 km/s", "450,000 km/s", "600,000 km/s"],
+    "correct": 1
+  }
+]

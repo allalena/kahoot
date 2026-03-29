@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Battle - Host</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --team1: #e21b3c; --team2: #1368ce; --team3: #d89e00;
+    --team4: #26890c; --team5: #9b59b6; --team6: #e67e22;
+    --bg: #1a0533; --card: #2d1150; --text: #f2f2f2;
+  }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+  }
+  header {
+    width: 100%; text-align: center; padding: 20px 16px 10px;
+    background: linear-gradient(135deg, #46007a, #1a0533);
+  }
+  header h1 { font-size: 2.4rem; letter-spacing: 2px; }
+  header .sub { font-size: .95rem; opacity: .7; margin-top: 4px; }
+
+  .screen { display: none; width: 100%; max-width: 1000px; padding: 24px 16px; }
+  .screen.active { display: block; }
+
+  /* Lobby */
+  #lobby { text-align: center; padding-top: 30px; }
+  .qr-section { margin: 20px 0; }
+  .qr-section img { border-radius: 12px; background: #fff; padding: 8px; }
+  .join-url { font-size: 1.3rem; margin: 12px 0; word-break: break-all; }
+  .join-url a { color: #c471f5; }
+  .lobby-teams {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    margin: 24px 0; text-align: left;
+  }
+  @media (max-width: 600px) { .lobby-teams { grid-template-columns: repeat(2, 1fr); } }
+  .lobby-team {
+    background: var(--card); border-radius: 10px; padding: 14px;
+    border-left: 4px solid;
+  }
+  .lobby-team .lt-name { font-weight: 700; font-size: 1.05rem; margin-bottom: 6px; }
+  .lobby-team .lt-players { font-size: .85rem; opacity: .7; }
+  .lobby-team .lt-players span { display: block; opacity: 1; color: #fff; }
+
+  .btn {
+    display: inline-block; padding: 16px 48px; font-size: 1.3rem; font-weight: 700;
+    border: none; border-radius: 8px; cursor: pointer; color: #fff;
+    background: linear-gradient(135deg, #7b2ff7, #c471f5);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(123,47,247,.5); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-green { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+  .btn-green:hover { box-shadow: 0 6px 20px rgba(46,204,113,.5); }
+  .btn-red { background: linear-gradient(135deg, #e21b3c, #c0392b); }
+
+  /* Question */
+  #question-view .progress { text-align: center; font-size: 1rem; opacity: .65; margin-bottom: 8px; }
+  .timer-text { text-align: center; font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+  .timer-bar-wrap {
+    width: 100%; height: 10px; background: rgba(255,255,255,.1);
+    border-radius: 5px; margin-bottom: 20px; overflow: hidden;
+  }
+  .timer-bar {
+    height: 100%; border-radius: 5px; transition: width .3s linear;
+    background: linear-gradient(90deg, #2ecc71, #f9d423, #e21b3c); width: 100%;
+  }
+  .question-box {
+    background: var(--card); border-radius: 12px; padding: 32px 24px;
+    text-align: center; margin-bottom: 24px; box-shadow: 0 4px 24px rgba(0,0,0,.4);
+  }
+  .question-box h2 { font-size: 1.7rem; line-height: 1.4; }
+  .answers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+  .answer-card {
+    padding: 20px 14px; font-size: 1.2rem; font-weight: 600;
+    border-radius: 8px; color: #fff; text-align: center;
+  }
+  .answer-card:nth-child(1) { background: var(--team1); }
+  .answer-card:nth-child(2) { background: var(--team2); }
+  .answer-card:nth-child(3) { background: var(--team3); }
+  .answer-card:nth-child(4) { background: var(--team4); }
+
+  .team-status-grid {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 20px;
+  }
+  @media (max-width: 700px) { .team-status-grid { grid-template-columns: repeat(3, 1fr); } }
+  .team-status {
+    background: var(--card); border-radius: 8px; padding: 10px 6px;
+    text-align: center; border: 2px solid rgba(255,255,255,.1); transition: border-color .3s;
+  }
+  .team-status.locked { border-color: #2ecc71; }
+  .team-status .ts-name { font-weight: 700; font-size: .9rem; }
+  .team-status .ts-info { font-size: .75rem; opacity: .6; margin-top: 4px; }
+  .team-status.locked .ts-info { opacity: 1; color: #2ecc71; }
+
+  /* Results */
+  #results-view { text-align: center; }
+  #results-view h2 { font-size: 1.5rem; margin-bottom: 8px; }
+  .correct-banner {
+    font-size: 1.1rem; margin-bottom: 20px; padding: 14px 20px;
+    background: rgba(46,204,113,.15); border: 2px solid #2ecc71;
+    border-radius: 8px; display: inline-block;
+  }
+  .results-table {
+    width: 100%; border-collapse: collapse; font-size: 1.05rem; margin: 20px 0;
+  }
+  .results-table th, .results-table td { padding: 12px 14px; text-align: center; }
+  .results-table th { background: var(--card); border-bottom: 2px solid rgba(255,255,255,.1); }
+  .results-table td { border-bottom: 1px solid rgba(255,255,255,.06); }
+  .correct-row { background: rgba(46,204,113,.12); }
+  .wrong-row { background: rgba(231,76,60,.08); }
+
+  /* Final */
+  #final-view { text-align: center; padding-top: 20px; }
+  #final-view h2 { font-size: 2.2rem; margin-bottom: 24px; }
+  .podium { display: flex; justify-content: center; align-items: flex-end; gap: 16px; margin-bottom: 36px; }
+  .podium-item {
+    text-align: center; border-radius: 10px 10px 0 0;
+    padding: 18px 24px 14px; min-width: 130px; color: #fff; font-weight: 700;
+  }
+  .podium-item.gold { background: linear-gradient(180deg, #f9d423, #e6a100); min-height: 180px; }
+  .podium-item.silver { background: linear-gradient(180deg, #bdc3c7, #95a5a6); min-height: 140px; }
+  .podium-item.bronze { background: linear-gradient(180deg, #e67e22, #d35400); min-height: 110px; }
+  .podium-item .rank { font-size: 2rem; }
+  .podium-item .p-name { font-size: 1.1rem; margin: 6px 0 4px; }
+  .podium-item .p-pts { font-size: .95rem; opacity: .85; }
+
+  .full-standings {
+    width: 100%; border-collapse: collapse; font-size: 1.05rem; margin-bottom: 30px;
+  }
+  .full-standings th, .full-standings td { padding: 12px 16px; text-align: center; }
+  .full-standings th { background: var(--card); border-bottom: 2px solid rgba(255,255,255,.1); }
+  .full-standings td { border-bottom: 1px solid rgba(255,255,255,.06); }
+
+  .actions { text-align: center; margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Quiz Battle</h1>
+  <div class="sub">Host Screen</div>
+</header>
+
+<!-- LOBBY -->
+<div id="lobby" class="screen active">
+  <h2>Scan to Join!</h2>
+  <div class="qr-section">
+    <img id="qr-img" alt="QR Code" />
+  </div>
+  <div class="join-url">Join at: <a id="join-url" href="#" target="_blank"></a></div>
+  <div class="lobby-teams" id="lobby-teams"></div>
+  <button class="btn btn-green" id="start-btn" onclick="startGame()">Start Game</button>
+</div>
+
+<!-- QUESTION -->
+<div id="question-view" class="screen">
+  <div class="progress" id="q-progress"></div>
+  <div class="timer-text" id="q-timer"></div>
+  <div class="timer-bar-wrap"><div class="timer-bar" id="q-timer-bar"></div></div>
+  <div class="question-box"><h2 id="q-text"></h2></div>
+  <div class="answers-grid" id="q-answers"></div>
+  <div class="team-status-grid" id="q-teams"></div>
+</div>
+
+<!-- RESULTS -->
+<div id="results-view" class="screen">
+  <h2 id="r-title"></h2>
+  <div class="correct-banner" id="r-correct"></div>
+  <table class="results-table" id="r-table"></table>
+  <div class="actions">
+    <button class="btn" id="r-next-btn" onclick="nextQuestion()">Next Question</button>
+  </div>
+</div>
+
+<!-- FINAL -->
+<div id="final-view" class="screen">
+  <h2>Final Results</h2>
+  <div class="podium" id="f-podium"></div>
+  <table class="full-standings" id="f-standings"></table>
+  <div class="actions">
+    <button class="btn btn-red" onclick="restartGame()">Play Again</button>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+const TIME_LIMIT = 60;
+const LABELS = ['A', 'B', 'C', 'D'];
+const TEAM_NAMES = ['Team 1','Team 2','Team 3','Team 4','Team 5','Team 6'];
+const TEAM_COLORS = ['#e21b3c','#1368ce','#d89e00','#26890c','#9b59b6','#e67e22'];
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// Load QR
+fetch('/api/qrcode').then(r => r.json()).then(data => {
+  document.getElementById('qr-img').src = data.qr;
+  document.getElementById('join-url').href = data.url;
+  document.getElementById('join-url').textContent = data.url;
+});
+
+socket.emit('host:join');
+
+// Lobby updates
+socket.on('lobby:update', (data) => renderLobby(data));
+
+socket.on('game:state', (data) => {
+  if (data.state === 'lobby') {
+    show('lobby');
+    renderLobby(data.lobby);
+  } else if (data.state === 'question') {
+    show('question-view');
+    renderQuestion(data);
+  }
+});
+
+function renderLobby(data) {
+  const el = document.getElementById('lobby-teams');
+  el.innerHTML = data.teams.map((t, i) => `
+    <div class="lobby-team" style="border-color:${t.color}">
+      <div class="lt-name" style="color:${t.color}">${t.name}</div>
+      <div class="lt-players">
+        ${t.players.length === 0 ? '<em>No players yet</em>' :
+          t.players.map(p => `<span>${p}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  const hasPlayers = data.teams.some(t => t.players.length > 0);
+  document.getElementById('start-btn').disabled = !hasPlayers;
+}
+
+function renderQuestion(data) {
+  document.getElementById('q-progress').textContent =
+    `Question ${data.currentQ + 1} of ${data.total}`;
+  document.getElementById('q-timer').textContent = data.timeLeft + 's';
+  document.getElementById('q-timer-bar').style.width =
+    (data.timeLeft / TIME_LIMIT * 100) + '%';
+
+  if (data.question) {
+    document.getElementById('q-text').textContent = data.question.question;
+    document.getElementById('q-answers').innerHTML = data.question.answers.map((a, i) =>
+      `<div class="answer-card">${LABELS[i]}.  ${a}</div>`
+    ).join('');
+  }
+
+  document.getElementById('q-teams').innerHTML = TEAM_NAMES.map((name, i) =>
+    `<div class="team-status ${data.teamLockedIn[i] ? 'locked' : ''}">
+      <div class="ts-name" style="color:${TEAM_COLORS[i]}">${name}</div>
+      <div class="ts-info">${data.teamLockedIn[i] ? 'Locked in!' : 'Waiting...'}</div>
+    </div>`
+  ).join('');
+}
+
+socket.on('timer:tick', (timeLeft) => {
+  document.getElementById('q-timer').textContent = timeLeft + 's';
+  document.getElementById('q-timer-bar').style.width =
+    (timeLeft / TIME_LIMIT * 100) + '%';
+});
+
+// Results
+socket.on('game:results', (data) => {
+  show('results-view');
+  document.getElementById('r-title').textContent = 'Round Results';
+  document.getElementById('r-correct').innerHTML =
+    `Correct: <strong>${LABELS[data.correctIndex]}. ${data.correctText}</strong>`;
+
+  const activeTeams = data.teams.filter(t => t.playerCount > 0);
+  document.getElementById('r-table').innerHTML = `
+    <thead><tr><th>Team</th><th>Answer</th><th>Result</th><th>Score</th></tr></thead>
+    <tbody>${activeTeams.map(t => `
+      <tr class="${t.isCorrect ? 'correct-row' : 'wrong-row'}">
+        <td style="color:${t.color};font-weight:700">${t.name}</td>
+        <td>${t.answer >= 0 ? LABELS[t.answer] + '. ' + t.answerText : 'No answer'}</td>
+        <td>${t.isCorrect ? 'Correct' : 'Wrong'}</td>
+        <td><strong>${t.score}</strong> pts</td>
+      </tr>
+    `).join('')}</tbody>`;
+
+  document.getElementById('r-next-btn').textContent =
+    data.isLast ? 'See Final Results' : 'Next Question';
+});
+
+// Final
+socket.on('game:final', (data) => {
+  show('final-view');
+  const ranked = data.ranked;
+
+  const podium = document.getElementById('f-podium');
+  const podiumData = [
+    { rank: 2, css: 'silver' },
+    { rank: 1, css: 'gold' },
+    { rank: 3, css: 'bronze' },
+  ];
+  podium.innerHTML = podiumData.map(({ rank, css }) => {
+    const idx = rank - 1;
+    if (idx >= ranked.length) return '';
+    const r = ranked[idx];
+    return `<div class="podium-item ${css}">
+      <div class="rank">#${rank}</div>
+      <div class="p-name">${r.name}</div>
+      <div class="p-pts">${r.score} pts</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('f-standings').innerHTML = `
+    <thead><tr><th>Rank</th><th>Team</th><th>Score</th></tr></thead>
+    <tbody>${ranked.map((r, i) => `
+      <tr>
+        <td>#${i + 1}</td>
+        <td style="color:${r.color};font-weight:700">${r.name}</td>
+        <td><strong>${r.score}</strong> pts</td>
+      </tr>
+    `).join('')}</tbody>`;
+});
+
+function startGame() { socket.emit('host:start'); }
+function nextQuestion() { socket.emit('host:next'); }
+function restartGame() { socket.emit('host:restart'); }
+</script>
+</body>
+</html>
