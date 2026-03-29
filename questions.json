@@ -1,42 +1,62 @@
 [
   {
-    "question": "What is the capital of France?",
-    "answers": ["Berlin", "Paris", "Madrid", "Rome"],
-    "correct": 1
-  },
-  {
-    "question": "Which planet is known as the Red Planet?",
-    "answers": ["Venus", "Jupiter", "Mars", "Saturn"],
+    "question": "Someone gives Zakat al-Fitr 2 days after Eid. What is it now?",
+    "answers": ["Zakat al-Fitr", "Extra reward", "Regular charity", "Invalid action"],
     "correct": 2
   },
   {
-    "question": "What is the largest ocean on Earth?",
-    "answers": ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+    "question": "Someone fasts on Eid “to be extra good.” This is…",
+    "answers": ["Good", "OK", "Haram", "Recommended"],
+    "correct": 2
+  },
+  {
+    "question": "Someone buys expensive clothes for Eid but ignores the poor. What is missing?",
+    "answers": ["Style", "Sunnah", "Sincerity & mercy", "Nothing"],
+    "correct": 2
+  },
+  {
+    "question": "Someone prays Eid but does not listen to khutbah. What did they miss?",
+    "answers": ["Nothing", "Part of Eid guidance", "Prayer invalid", "Reward lost"],
+    "correct": 1
+  },
+  {
+    "question": "Main connection between Ramadan and Eid?",
+    "answers": ["Celebration", "Reward after obedience", "Food", "Family time"],
+    "correct": 1
+  },
+  {
+    "question": "Someone eats before Eid al-Adha prayer. This is…",
+    "answers": ["Sunnah", "OK", "Against Sunnah", "Haram"],
+    "correct": 2
+  },
+  {
+    "question": "Someone does Udhiyah just to show off. What happens?",
+    "answers": ["Double reward", "Normal reward", "No reward", "More meat"],
+    "correct": 2
+  },
+  {
+    "question": "Someone only celebrates with friends and ignores family. What is missing?",
+    "answers": ["Fun", "Time", "Silat ar-rahim", "Money"],
+    "correct": 2
+  },
+  {
+    "question": "Someone takes selfies during takbeer and ignores dhikr. What is the problem?",
+    "answers": ["Nothing", "Distraction from worship", "Good memory", "Sunnah"],
+    "correct": 1
+  },
+  {
+    "question": "Someone prays Eid but does not give Zakat al-Fitr. What is missing?",
+    "answers": ["Nothing", "Important obligation", "Only Sunnah", "Optional"],
+    "correct": 1
+  },
+  {
+    "question": "Someone wastes food on Eid. What does this go against?",
+    "answers": ["OK", "Generosity", "Sunnah", "Islamic adab"],
     "correct": 3
-  },
+  }
   {
-    "question": "Who painted the Mona Lisa?",
-    "answers": ["Leonardo da Vinci", "Michelangelo", "Raphael", "Donatello"],
-    "correct": 0
-  },
-  {
-    "question": "What is the chemical symbol for gold?",
-    "answers": ["Go", "Gd", "Au", "Ag"],
+    "question": "Main lesson from the story of Prophet Ibrahim عليه السلام?",
+    "answers": ["Celebration", "Animal sacrifice", "Submission to Allah", "Strength"],
     "correct": 2
-  },
-  {
-    "question": "How many continents are there?",
-    "answers": ["5", "6", "7", "8"],
-    "correct": 2
-  },
-  {
-    "question": "What year did World War II end?",
-    "answers": ["1943", "1944", "1945", "1946"],
-    "correct": 2
-  },
-  {
-    "question": "What is the speed of light approximately?",
-    "answers": ["150,000 km/s", "300,000 km/s", "450,000 km/s", "600,000 km/s"],
-    "correct": 1
   }
 ]
